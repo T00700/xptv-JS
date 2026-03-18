@@ -1,11 +1,11 @@
-// const CryptoJS = createCryptoJS()
-
 let appConfig = {
-    ver: 20251120,
+    ver: 20260318,
     title: 'jianpian',
+    // api.ztcgi.com
     site: 'https://ev5356.970xw.com',
+    imgDomain: 'img.jgsfnl.com',
     tabs: [
-        { name: '首頁', ext: { id: 'home' } },
+        { name: '首頁', ext: { id: 'home' }, ui: 1 },
         { name: '電影', ext: { id: 1 } },
         { name: '電視劇', ext: { id: 2 } },
         { name: '動漫', ext: { id: 3 } },
@@ -21,10 +21,18 @@ async function getConfig() {
 }
 
 async function getImgDomain() {
-    let { data } = await $fetch.get(`${appConfig.site}/api/appAuthConfig`, { headers: getHeader() })
-    let domain = argsify(data).data.imgDomain
+    try {
+        let { data } = await $fetch.get(`${appConfig.site}/api/v2/settings/resourceDomainConfig`, {
+            headers: getHeader(),
+        })
+        let domain = argsify(data).data.imgDomain
+        let domainList = domain.split(',')
+        domain = domainList[Math.floor(Math.random() * domainList.length)]
 
-    return domain.startsWith('http') ? domain : 'https://' + domain
+        return domain.startsWith('http') ? domain : 'https://' + domain
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 async function getCards(ext) {
